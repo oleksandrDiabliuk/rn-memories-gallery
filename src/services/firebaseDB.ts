@@ -1,7 +1,7 @@
-import { doc, setDoc, collection, query, getDocs, orderBy, limit, deleteDoc, where, or } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, setDoc, collection, query, getDocs, deleteDoc, where, or } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from './config';
-import { MemoryCreate, Attachment } from '../types';
+import { MemoryCreate, Attachment, Memory } from '../types';
 import { HASHTAG_REGEX } from '../constants';
 
 const uriToBlob = (uri: string): Promise<Blob> => {
@@ -73,6 +73,18 @@ export const saveMedia = async (media: Attachment[], onSuccess: () => void) => {
   };
 };
 
+export const deleteMedia = async (media: string[]) => {
+  try {
+    media.forEach(async (url: string) => {
+      const fileRef = ref(storage, url);
+      await deleteObject(fileRef);
+    });
+  } catch(error) {
+    console.log(error)
+    throw error;
+  };
+};
+
 export const saveMemory = async (memory: MemoryCreate, onSuccess: () => void) => {
   try {
     const {
@@ -105,9 +117,10 @@ export const saveMemory = async (memory: MemoryCreate, onSuccess: () => void) =>
   }
 };
 
-export const deleteMemory = async (id: string, onSuccess: () => void) => {
+export const deleteMemory = async (memory: Memory, onSuccess: () => void) => {
   try {
-    await deleteDoc(doc(db, 'memories', id));
+    await deleteDoc(doc(db, 'memories', memory.id));
+    await deleteMedia(memory.media_urls);
     
     onSuccess();
   } catch(error) {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { ScrollView, View, Image } from "react-native";
 import ImageCropPicker from 'react-native-image-crop-picker';
 import ImageEditor from '@thienmd/react-native-image-editor';
+import RNFS from 'react-native-fs';
+import RNFetchBlob from 'rn-fetch-blob';
 import { useIsFocused } from '@react-navigation/native';
 import ImageView from "react-native-image-viewing";
 import { VideoView } from '../video';
@@ -10,8 +12,6 @@ import { AuthButton, MainButton, Button } from '../buttons';
 import { MemoryCreate, Attachment } from '../../types';
 import { HASHTAG_REGEX } from '../../constants';
 import { addNewMemory } from '../../styles';
-import RNFS from 'react-native-fs';
-import RNFetchBlob from 'rn-fetch-blob';
 
 type Props = {
   loading: boolean;

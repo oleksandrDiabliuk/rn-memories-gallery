@@ -27,7 +27,7 @@ export const MemoryDetails = ({navigation, route}) => {
     navigation.goBack();
   };
   const handleDelete = () => {
-    deleteMemory(memory.id, onSuccess);
+    deleteMemory(memory, onSuccess);
   };
   const confirmDelete = () => {
     Alert.alert('Delete memory?', 'Are you sure you want to delete memory?', [{
