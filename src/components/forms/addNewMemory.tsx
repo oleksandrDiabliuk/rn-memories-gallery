@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, View, Image } from "react-native";
 import ImageCropPicker from 'react-native-image-crop-picker';
+import ImageEditor from '@thienmd/react-native-image-editor';
 import { useIsFocused } from '@react-navigation/native';
 import ImageView from "react-native-image-viewing";
 import { VideoView } from '../video';
@@ -9,6 +10,8 @@ import { AuthButton, MainButton, Button } from '../buttons';
 import { MemoryCreate, Attachment } from '../../types';
 import { HASHTAG_REGEX } from '../../constants';
 import { addNewMemory } from '../../styles';
+import RNFS from 'react-native-fs';
+import RNFetchBlob from 'rn-fetch-blob';
 
 type Props = {
   loading: boolean;
@@ -26,6 +29,24 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const [mediaLoading, setLoading] = useState<boolean>(false);
   const isFocused = useIsFocused();
+
+  const onEdit = () => {
+    ImageEditor.Edit({
+      path: `${RNFS.CachesDirectoryPath}/${mediaForSend[0].filename}`,
+      languages: {},
+      onDone: (img: string) => {
+        const newMediaForSend = [...mediaForSend];
+        newMediaForSend[visibleIndex] = {
+          ...newMediaForSend[visibleIndex],
+          data: img,
+        };
+        setMediaForSend(newMediaForSend);
+      },
+      onCancel: (code) => {
+        console.log(code)
+      }
+    });
+  };
 
   useEffect(() => {
     if (!isFocused) {
@@ -79,6 +100,23 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
         allMediasForSend.push(img);
 
         setMediaForSend(allMediasForSend);
+
+        let photoPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+        RNFetchBlob.config({fileCache: true})
+          .fetch('GET', response.sourceURL || '')
+          .then((resp: {path: () => string}) => {
+            RNFS.moveFile(resp.path(), photoPath)
+              .then(() => {
+                console.log('FILE WRITTEN!');
+              })
+              .catch((err) => {
+                console.log('Move file error: ', err.message);
+              });
+          })
+          .catch((err: {message: any}) => {
+            console.log('Get file error: ', err.message);
+          });
       }
       setLoading(false);
     } catch(error) {
@@ -174,7 +212,7 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
           <View style={{flexDirection: 'row', justifyContent: 'space-around', padding: 16, marginBottom: 16}}>
             <MainButton
               title="Edit"
-              onPress={submit}
+              onPress={onEdit}
               style={{minWidth: 100, padding: 16}}
             />
             <AuthButton
