@@ -10,9 +10,13 @@ export const memoryDetails = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  sliderContainer: {
+    alignItems: 'center',
+    flex: 1,
+    maxHeight: 200,
+  },
   memoryCard: {
     marginHorizontal: 16,
-    alignItems: 'center',
     flex: 1,
   },
   description: {

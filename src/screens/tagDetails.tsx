@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, ScrollView, Image } from "react-native";
 import ImageView from "react-native-image-viewing";
+import { VideoView } from '../components/video';
 import { NavBar } from '../components/navBar/navbar';
 import { Button } from '../components/buttons';
 import { ROUTES } from '../constants';
@@ -33,7 +34,14 @@ export const TagDetails = ({navigation, route}) => {
       />
       <ScrollView>
         <View style={tagDetails.tagImagesContainer}>
-          {tag[tagTitle].map((url: string, index: number) => (
+          {tag[tagTitle].map((url: string, index: number) => url.includes('mp4') ? (
+            <VideoView
+              key={url}
+              url={url}
+              buttonStyle={tagDetails.tagImageContainer}
+              style={tagDetails.image}
+            />
+          ) : (
             <Button
               onPress={handlePreview}
               key={index}
@@ -50,7 +58,7 @@ export const TagDetails = ({navigation, route}) => {
         </View>
       </ScrollView>
       <ImageView
-        images={(tag[tagTitle] || []).map((img: string) => ({uri: img}))}
+        images={(tag[tagTitle] || []).filter((img: string) => !img.includes('mp4')).map((img: string) => ({uri: img}))}
         imageIndex={visibleIndex}
         visible={visible}
         onRequestClose={() => setIsVisible(false)}

@@ -42,6 +42,7 @@ export const MemoryItem = ({memory, onDetails}: Props) => {
           <Video
             source={{uri: url}}
             style={style.video}
+            muted
           />
           <View style={style.titleContainer}>
             <Text style={style.title}>{title}</Text>

@@ -29,7 +29,6 @@ export const Home = ({navigation}) => {
   };
   const handleSearch = async (search: string) => {
     try {
-      console.log('SREFCSVSREVSRV -> ', search)
       if (search) {
         const memoriesData = await searchMemories(search);
         setSearch(search);

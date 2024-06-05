@@ -14,9 +14,16 @@ export const tagItemStyles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 10,
   },
+  video: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   imgOverflow: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',

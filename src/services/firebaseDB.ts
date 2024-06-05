@@ -28,7 +28,6 @@ export const getMediaUrl = async (url: string) => {
   try {
     const fileRef = ref(storage, url);
     const media = await getDownloadURL(fileRef);
-    console.log(url, media)
 
     return media;
   } catch(error) {
@@ -63,12 +62,10 @@ export const saveMedia = async (media: Attachment[], onSuccess: () => void) => {
     media.forEach(async (file, index) => {
       const fileRef = ref(storage, `/media/${file.filename}`);
       const data = await uriToBlob(file.data);
-      console.log('uriToBlob -> ', data, 'file.type -> ', file.type)
       const res = await uploadBytes(fileRef, data);
       if (res && index === 0) {
         onSuccess();
       }
-      console.log('uploadBytes -> ', res)
     });
   } catch(error) {
     console.log(error)

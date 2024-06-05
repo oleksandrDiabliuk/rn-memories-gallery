@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, Alert, Image, StyleProp, ImageStyle } from "react-native";
 import ImageSlider from 'react-native-image-slider';
 import ImageView from "react-native-image-viewing";
 import { NavBar } from '../components/navBar/navbar';
 import { MainButton, Button } from '../components/buttons';
+import { VideoView } from '../components/video';
 import { ROUTES } from '../constants';
-import { deleteMemory, getMediaUrl } from '../services/firebaseDB';
+import { deleteMemory } from '../services/firebaseDB';
 import { memoryDetails } from '../styles';
 
 export const MemoryDetails = ({navigation, route}) => {
   const [visible, setIsVisible] = useState<boolean>(false);
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
-  const [urls, setUrls] = useState<string[]>([]);
   const {memory} = route.params;
   const handleBack = () => {
     navigation.goBack();
@@ -39,15 +39,6 @@ export const MemoryDetails = ({navigation, route}) => {
       style: 'cancel',
     }]);
   };
-  const getUrls = async () => {
-    const uris = [] as string[];
-    memory.media_urls.forEach((url: string) => {
-      getMediaUrl(url).then(uri => {
-        uris.push(uri);
-        setUrls(uris);
-      });
-    });
-  };
 
   const renderCustomSlide = ({
     item: image,
@@ -60,7 +51,13 @@ export const MemoryDetails = ({navigation, route}) => {
     index: number;
     width: number;
   }) => {
-    return (
+    return image.includes('mp4') ? (
+      <VideoView
+        url={image}
+        buttonStyle={{alignItems: 'center'}}
+        style={{width: width, height: '100%'}}
+      />
+    ) : (
       <Button
         onPress={handlePreview}
         value={index}
@@ -81,10 +78,6 @@ export const MemoryDetails = ({navigation, route}) => {
     );
   }
 
-  useEffect(() => {
-    getUrls();
-  }, []);
-
   return (
     <View style={memoryDetails.container}>
       <NavBar
@@ -94,12 +87,14 @@ export const MemoryDetails = ({navigation, route}) => {
         onBack={handleBack}
       />
       <View style={memoryDetails.memoryCard}>
-        <ImageSlider
-          images={urls}
-          onPress={handlePreview}
-          customSlide={renderCustomSlide}
-          style={{maxHeight: 200, borderRadius: 10, margin: 12, width: '100%', alignSelf: 'center'}}
-        />
+        <View style={memoryDetails.sliderContainer}>
+          <ImageSlider
+            images={memory.urls}
+            onPress={handlePreview}
+            customSlide={renderCustomSlide}
+            style={{maxHeight: 200, borderRadius: 10, margin: 12, width: '100%', alignSelf: 'center'}}
+          />
+        </View>
         <Text>{memory.description}</Text>
         <View style={memoryDetails.tags}>
           <Text style={memoryDetails.tagTitle}>Tags:</Text>
@@ -115,7 +110,7 @@ export const MemoryDetails = ({navigation, route}) => {
         />
       </View>
       <ImageView
-        images={(urls || []).map(img => ({uri: img}))}
+        images={(memory.urls || []).filter((img: string) => !img.includes('mp4')).map((img: string) => ({uri: img}))}
         imageIndex={visibleIndex}
         visible={visible}
         onRequestClose={() => setIsVisible(false)}

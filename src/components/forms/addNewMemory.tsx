@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollView, View, Image } from "react-native";
-import Video, { VideoRef } from "react-native-video";
 import ImageCropPicker from 'react-native-image-crop-picker';
-import { launchImageLibrary } from 'react-native-image-picker';
 import { useIsFocused } from '@react-navigation/native';
 import ImageView from "react-native-image-viewing";
+import { VideoView } from '../video';
 import { InputText, DateInput } from '../inputs';
 import { AuthButton, MainButton, Button } from '../buttons';
-import { errorAlert } from '../../services/alert';
 import { MemoryCreate, Attachment } from '../../types';
 import { HASHTAG_REGEX } from '../../constants';
 import { addNewMemory } from '../../styles';
@@ -26,10 +24,8 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
   const [mediaForSend, setMediaForSend] = useState<Attachment[]>([]);
   const [visible, setIsVisible] = useState<boolean>(false);
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
-  const [fullscreen, setFullScreen] = useState<boolean>(false);
   const [mediaLoading, setLoading] = useState<boolean>(false);
   const isFocused = useIsFocused();
-  const videoRef = useRef<VideoRef>(null)
 
   useEffect(() => {
     if (!isFocused) {
@@ -71,12 +67,9 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
         compressVideoPreset: 'MediumQuality',
         compressImageMaxHeight: 720,
         compressImageMaxWidth: 720,
-        // cropping: true,
-        // forceJpg: true,
       });
       if (response.path) {
         const fileName = `${new Date().getTime()}.${response.mime.includes('video') ? response.mime.replace('video/', '') : response.mime.replace('image/', '')}`;
-        console.log(fileName)
         const img = {
           data: response.path,
           filename: fileName,
@@ -88,55 +81,15 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
         setMediaForSend(allMediasForSend);
       }
       setLoading(false);
-      console.log(response)
     } catch(error) {
       setLoading(false);
       throw error;
     }
   };
 
-  const launchGalleryFromCamera = async () => {
-    try {
-      setLoading(true);
-      const result = await launchImageLibrary({
-        mediaType: 'mixed',
-        formatAsMp4: true,
-        quality: 0.8,
-        videoQuality: 'medium',
-        maxWidth: 1024,
-        selectionLimit: 1,
-      });
-
-      if (result.assets) {
-        const res = result.assets[0];
-        const img = {
-          data: (res.uri || '').replace('file://', ''),
-          filename: res.fileName,
-          type: res.type,
-        }
-        const allMediasForSend = [...mediaForSend];
-        allMediasForSend.push(img);
-
-        setMediaForSend(allMediasForSend);
-      } else {
-        errorAlert(result.errorMessage || 'Something went wrong.');
-      }
-      setLoading(false);
-    } catch(error: any) {
-      setLoading(false);
-      errorAlert(error);
-    }
-  };
   const handlePreview = (index: number) => {
     setVisibleIndex(index);
     setIsVisible(true);
-  };
-  const handleVideoFullscreen = () => {
-    setFullScreen(true);
-    videoRef?.current?.presentFullscreenPlayer();
-  };
-  const onImageIndexChange = (index: any) => {
-    setVisibleIndex(index);
   };
   const handleDeleteImg = (index: number) => {
     const allMediasForSend = [...mediaForSend];
@@ -177,22 +130,27 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
         />
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16, flexWrap: 'wrap'}}>
           {mediaForSend.map((img, index) => img.type?.includes('mp4') ? (
-            <Button
+            <VideoView
               key={img.filename}
-              style={{shadowRadius: 1, shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.4, marginVertical: 4}}
-              onPress={handleVideoFullscreen}
-              value={index}
-            >
-              <Video
-                ref={videoRef}
-                source={{uri: img.data}}
-                style={{width: 100, height: 100, borderRadius: 10}}
-              />
-            </Button>
+              url={img.data}
+              buttonStyle={{
+                shadowRadius: 1,
+                shadowOffset: {width: 0, height: 1},
+                shadowOpacity: 0.4,
+                marginVertical: 4,
+                width: 100, height: 100
+              }}
+              style={{width: 100, height: 100}}
+            />
           ) : (
             <Button
               key={img.filename}
-              style={{shadowRadius: 1, shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.4, marginVertical: 4}}
+              style={{
+                shadowRadius: 1,
+                shadowOffset: {width: 0, height: 1},
+                shadowOpacity: 0.4,
+                marginVertical: 4,
+              }}
               onPress={handlePreview}
               value={index}
             >
@@ -207,9 +165,10 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
         onPress={submit}
       />
       <ImageView
-        images={mediaForSend.map(img => ({uri: img.data}))}
+        images={mediaForSend.filter((img: Attachment) => !img.data.includes('mp4')).map(img => ({uri: img.data}))}
         imageIndex={visibleIndex}
         visible={visible}
+        onImageIndexChange={setVisibleIndex}
         onRequestClose={() => setIsVisible(false)}
         FooterComponent={() => (
           <View style={{flexDirection: 'row', justifyContent: 'space-around', padding: 16, marginBottom: 16}}>
@@ -223,7 +182,6 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
               onPress={handleDeleteImg}
               value={visibleIndex}
               style={{minWidth: 100, padding: 16}}
-              onImageIndexChange={onImageIndexChange}
             />
           </View>
         )}

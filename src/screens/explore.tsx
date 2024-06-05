@@ -45,9 +45,10 @@ export const Explore = ({navigation}) => {
       />
       <ScrollView contentContainerStyle={main.list}>
         <View style={main.tagsContainer}>
-          {Object.keys(memoriesTags).map((tagKey: string, index) => (
+          {Object.keys(memoriesTags).filter((tag: string) => memoriesTags[tag].length > 1).map((tagKey: string, index) => (
             <TagItem
               tagKey={tagKey}
+              key={tagKey}
               images={memoriesTags[tagKey]}
               onDetails={onDetails}
             />

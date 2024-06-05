@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Text, ImageBackground, View } from "react-native";
+import Video from "react-native-video";
 import { Button } from '../buttons';
 import { Tag } from '../../types';
 import { getMediaUrl } from '../../services/firebaseDB';
@@ -28,9 +29,21 @@ export const TagItem = ({tagKey, images, onDetails}: Props) => {
     getUrls();
   }, []);
 
-  return (
+  return urls[0] ? (
     <Button onPress={onDetails} value={{[tagKey]: urls}}>
-      {urls[0] && (
+      { urls[0].includes('mp4') ? (
+        <View style={tagItemStyles.tagContainer}>
+          <Video
+            source={{uri: urls[0]}}
+            style={tagItemStyles.video}
+            paused
+            resizeMode="contain"
+          />
+          <View style={tagItemStyles.imgOverflow}>
+            <Text key={tagKey} style={tagItemStyles.tagTitle}>{`#${tagKey}`}</Text>
+          </View>
+        </View>
+      ) : (
           <ImageBackground
             source={{uri: urls[0]}}
             style={tagItemStyles.tagContainer}
@@ -43,5 +56,5 @@ export const TagItem = ({tagKey, images, onDetails}: Props) => {
           </ImageBackground>
       )}
     </Button>
-  )
+  ) : null
 };
