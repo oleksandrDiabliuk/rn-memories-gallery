@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, View, Image } from "react-native";
 import ImageCropPicker from 'react-native-image-crop-picker';
+import ImageEditor from '@thienmd/react-native-image-editor';
+import { VESDK } from 'react-native-videoeditorsdk';
+import RNFS from 'react-native-fs';
+import RNFetchBlob from 'rn-fetch-blob';
 import { useIsFocused } from '@react-navigation/native';
 import ImageView from "react-native-image-viewing";
 import { VideoView } from '../video';
 import { InputText, DateInput } from '../inputs';
+import { VideoModal } from '../video';
 import { AuthButton, MainButton, Button } from '../buttons';
 import { MemoryCreate, Attachment } from '../../types';
 import { HASHTAG_REGEX } from '../../constants';
@@ -25,6 +30,7 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
   const [visible, setIsVisible] = useState<boolean>(false);
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const [mediaLoading, setLoading] = useState<boolean>(false);
+  const [fullScreenVideo, setFullScreenVideo] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -79,6 +85,23 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
         allMediasForSend.push(img);
 
         setMediaForSend(allMediasForSend);
+
+        let photoPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+        RNFetchBlob.config({fileCache: true})
+          .fetch('GET', response.sourceURL || '')
+          .then((resp: {path: () => string}) => {
+            RNFS.moveFile(resp.path(), photoPath)
+              .then(() => {
+                console.log('FILE WRITTEN!');
+              })
+              .catch((err) => {
+                console.log('Move file error: ', err.message);
+              });
+          })
+          .catch((err: {message: any}) => {
+            console.log('Get file error: ', err.message);
+          });
       }
       setLoading(false);
     } catch(error) {
@@ -95,8 +118,71 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
     const allMediasForSend = [...mediaForSend];
     allMediasForSend.splice(index, 1);
     setMediaForSend(allMediasForSend);
+    setFullScreenVideo(false);
     setIsVisible(false);
     setVisibleIndex(0);
+  };
+  const onFullScreen = (index: number) => {
+    setFullScreenVideo(true);
+    setVisibleIndex(index);
+  };
+  const onFullScreenDismiss = () => {
+    setFullScreenVideo(false);
+  };
+  const onEdit = () => {
+    ImageEditor.Edit({
+      path: `${RNFS.CachesDirectoryPath}/${mediaForSend[visibleIndex].filename}`,
+      languages: {},
+      onDone: (img: string) => {
+        const newMediaForSend = [...mediaForSend];
+        newMediaForSend[visibleIndex] = {
+          ...newMediaForSend[visibleIndex],
+          data: img,
+        };
+        setMediaForSend(newMediaForSend);
+      },
+      onCancel: (code) => {
+        console.log(code)
+      }
+    });
+  };
+  const onEditVideo = () => {
+    onFullScreenDismiss();
+    VESDK.openEditor(`${RNFS.CachesDirectoryPath}/${mediaForSend[visibleIndex].filename}`, {
+      export: {
+        video: {
+          quality: 0.2,
+        },
+      },
+    }).then(
+      (result) => {
+        const photoPath = `${RNFS.CachesDirectoryPath}/edited_${mediaForSend[visibleIndex].filename}`;
+
+        RNFetchBlob.config({fileCache: true})
+          .fetch('GET', result?.video || '')
+          .then((resp: {path: () => string}) => {
+            RNFS.moveFile(resp.path(), photoPath)
+              .then(() => {
+                console.log('FILE WRITTEN!');
+              })
+              .catch((err) => {
+                console.log('Move file error: ', err.message);
+              });
+          })
+          .catch((err: {message: any}) => {
+            console.log('Get file error: ', err.message);
+          });
+        const newMediaForSend = [...mediaForSend];
+        newMediaForSend[visibleIndex] = {
+          ...newMediaForSend[visibleIndex],
+          data: result?.video || newMediaForSend[visibleIndex].data,
+        };
+        setMediaForSend(newMediaForSend);
+      },
+      (error) => {
+        console.log(error);
+      },
+    );
   };
 
   return (
@@ -141,6 +227,8 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
                 width: 100, height: 100
               }}
               style={{width: 100, height: 100}}
+              onFullScreen={onFullScreen}
+              index={index}
             />
           ) : (
             <Button
@@ -174,7 +262,7 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
           <View style={{flexDirection: 'row', justifyContent: 'space-around', padding: 16, marginBottom: 16}}>
             <MainButton
               title="Edit"
-              onPress={submit}
+              onPress={onEdit}
               style={{minWidth: 100, padding: 16}}
             />
             <AuthButton
@@ -185,6 +273,14 @@ export const AddNewMemoryForm = ({loading, handleCreate}: Props) => {
             />
           </View>
         )}
+      />
+      <VideoModal
+        url={mediaForSend[visibleIndex]?.data || ''}
+        isModalOpened={fullScreenVideo}
+        handleClose={onFullScreenDismiss}
+        handleDelete={handleDeleteImg}
+        handleEdit={onEditVideo}
+        index={visibleIndex}
       />
     </ScrollView>
   );

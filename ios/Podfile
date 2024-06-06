@@ -23,6 +23,9 @@ target 'Memories' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'RNImageEditor', :path => '../node_modules/@thienmd/react-native-image-editor/ios'
+  pod 'iOSPhotoEditor', :git => 'https://github.com/ThienMD/photo-editor', :branch => 'master'
+
   target 'MemoriesTests' do
     inherit! :complete
     # Pods for testing
