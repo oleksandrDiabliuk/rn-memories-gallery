@@ -1,5 +1,5 @@
 import { doc, setDoc, collection, query, getDocs, deleteDoc, where, or } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytes, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from './config';
 import { MemoryCreate, Attachment, Memory } from '../types';
 import { HASHTAG_REGEX } from '../constants';
@@ -62,8 +62,9 @@ export const saveMedia = async (media: Attachment[], onSuccess: () => void) => {
     media.forEach(async (file, index) => {
       const fileRef = ref(storage, `/media/${file.filename}`);
       const data = await uriToBlob(file.data);
-      const res = await uploadBytes(fileRef, data);
-      if (res && index === 0) {
+      const res = await uploadBytesResumable(fileRef, data);
+
+      if (res && index === media.length - 1) {
         onSuccess();
       }
     });

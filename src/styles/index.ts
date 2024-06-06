@@ -4,6 +4,7 @@ export * from './components/navbar';
 export * from './components/inputs';
 export * from './components/memory';
 export * from './components/tagItem';
+export * from './components/video';
 
 export * from './screens/profile';
 export * from './screens/main';

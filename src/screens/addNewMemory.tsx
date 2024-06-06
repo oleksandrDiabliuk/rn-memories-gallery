@@ -13,6 +13,7 @@ export const AddNewMemory = ({navigation}) => {
     navigation.navigate(ROUTES.PROFILE);
   };
   const onSuccess = () => {
+    setLoading(false);
     navigation.navigate(ROUTES.HOME);
   };
   const handleCreate = async (memory: MemoryCreate) => {
@@ -20,7 +21,6 @@ export const AddNewMemory = ({navigation}) => {
 
     try {
       await saveMemory(memory, onSuccess);
-      setLoading(false);
     } catch(error) {
       setLoading(false);
       throw error;
