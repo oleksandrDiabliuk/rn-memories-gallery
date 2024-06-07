@@ -6,15 +6,15 @@ import { auth } from '../../styles';
 
 type Props = {
   loading: boolean;
-  handleLogin: (email: string, password: string) => void;
+  handleSignUp: (email: string, password: string) => void;
 };
 
-export const RegistrationForm = ({loading, handleLogin}: Props) => {
+export const RegistrationForm = ({loading, handleSignUp}: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignIn = () => {
-    handleLogin(email, password);
+    handleSignUp(email, password);
   };
 
   return (

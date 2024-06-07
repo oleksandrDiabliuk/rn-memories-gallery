@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { LogBox } from "react-native";
 import { onAuthStateChanged } from 'firebase/auth';
 import { authentication } from './src/services/config';
+import './src/global.d';
 
 LogBox.ignoreLogs(["Warning: ..."]);
 LogBox.ignoreAllLogs();

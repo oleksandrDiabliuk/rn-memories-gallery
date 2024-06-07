@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { AuthErrorCodes } from 'firebase/auth'
 import { AuthBackground, LogoWithTitle, BottomSection } from '../components/auth';
 import { RegistrationForm } from '../components/forms';
 import { signup } from '../services/auth';
 import { errorAlert } from '../services/alert';
 import { ROUTES } from '../constants';
-import { useAuth } from '../routes/AuthContext';
+import { useAuth, GuestScreenProps } from '../routes';
 
-export const Register = ({navigation}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export const Register = ({navigation}: GuestScreenProps<ROUTES.REGISTER>) => {
   const [loading, setLoading] = useState(false);
   const { handleSetLoggedIn } = useAuth();
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (email: string, password: string) => {
     setLoading(true);
 
     try {
@@ -47,7 +44,7 @@ export const Register = ({navigation}) => {
       <LogoWithTitle title="Registration!" />
       <RegistrationForm
         loading={loading}
-        handleLogin={handleSignUp}
+        handleSignUp={handleSignUp}
       />
       <BottomSection
         title="Already have an account? Login here"

@@ -1,5 +1,5 @@
 import { doc, setDoc, collection, query, getDocs, deleteDoc, where, or } from "firebase/firestore";
-import { ref, uploadBytes, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from './config';
 import { MemoryCreate, Attachment, Memory } from '../types';
 import { HASHTAG_REGEX } from '../constants';

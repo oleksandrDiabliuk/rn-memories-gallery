@@ -7,9 +7,10 @@ import { ROUTES } from '../constants';
 import { Tag } from '../types';
 import { getMemories } from '../services/firebaseDB';
 import { getTags } from '../utils';
+import { RouteParamsListProps } from '../routes'
 import { main } from '../styles';
 
-export const Explore = ({navigation}) => {
+export const Explore = ({navigation}: RouteParamsListProps<ROUTES.EXPLORE>) => {
   const [memoriesTags, setMemories] = useState<Tag>({});
   const isFocused = useIsFocused();
   const refreshMemories = async () => {

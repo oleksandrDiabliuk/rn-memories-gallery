@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { NavBar } from '../components/navBar/navbar';
 import { AddNewMemoryForm } from '../components/forms'
 import { ROUTES } from '../constants';
-import { getMemories, saveMemory } from '../services/firebaseDB';
+import { saveMemory } from '../services/firebaseDB';
 import { MemoryCreate } from '../types';
+import { RouteParamsListProps } from '../routes'
 import { addNewMemory } from '../styles';
 
-export const AddNewMemory = ({navigation}) => {
+export const AddNewMemory = ({navigation}: RouteParamsListProps<ROUTES.ADD_NEW_MEMORY>) => {
   const [loading, setLoading] = useState(false);
   const onProfile = () => {
     navigation.navigate(ROUTES.PROFILE);

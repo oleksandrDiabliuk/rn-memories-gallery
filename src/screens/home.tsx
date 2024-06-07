@@ -7,9 +7,10 @@ import { Search } from '../components/inputs';
 import { ROUTES } from '../constants';
 import { getMemories, searchMemories } from '../services/firebaseDB';
 import { Memory } from '../types';
+import { RouteParamsListProps } from '../routes'
 import { main } from '../styles';
 
-export const Home = ({navigation}) => {
+export const Home = ({navigation}: RouteParamsListProps<ROUTES.HOME>) => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [searchValue, setSearch] = useState<string>("");
   const isFocused = useIsFocused();

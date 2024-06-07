@@ -7,6 +7,7 @@ export type Memory = {
   media_urls: string[];
   description: string;
   date: string;
+  urls?: string[];
 };
 
 export type MemoryCreate = {

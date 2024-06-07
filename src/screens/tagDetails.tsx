@@ -5,9 +5,10 @@ import { VideoView } from '../components/video';
 import { NavBar } from '../components/navBar/navbar';
 import { Button } from '../components/buttons';
 import { ROUTES } from '../constants';
+import { RouteParamsListProps } from '../routes';
 import { tagDetails } from '../styles';
 
-export const TagDetails = ({navigation, route}) => {
+export const TagDetails = ({navigation, route}: RouteParamsListProps<ROUTES.TAG_DETAILS>) => {
   const [visible, setIsVisible] = useState<boolean>(false);
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const {tag} = route.params;
