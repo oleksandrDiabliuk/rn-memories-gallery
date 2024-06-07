@@ -1,5 +1,7 @@
 import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import type { CompositeScreenProps } from '@react-navigation/native';
+import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import {
   Profile,
   MemoryDetails,
@@ -7,8 +9,24 @@ import {
 } from '../screens';
 import { Tabs } from './Tabs';
 import { ROUTES } from '../constants';
+import { Memory, Tag } from '../types';
 
-const Stack = createNativeStackNavigator();
+export type AppRoutesParamsListProps = {
+  tabs: undefined;
+  profile: undefined;
+  memoryDetails: {memory: Memory};
+  tagDetails: {tag: Tag};
+  home: undefined;
+  addNewMemory: undefined;
+  explore: undefined;
+};
+
+type ScreenProps <T extends keyof AppRoutesParamsListProps> = NativeStackScreenProps<AppRoutesParamsListProps, T>
+type TabsProps <T extends keyof AppRoutesParamsListProps> = BottomTabScreenProps<AppRoutesParamsListProps, T>
+
+export type RouteParamsListProps<T extends keyof AppRoutesParamsListProps> = CompositeScreenProps<ScreenProps<T>, TabsProps<T>>;
+
+const Stack = createNativeStackNavigator<AppRoutesParamsListProps>();
 
 export const AppRoutes = () => {
   return (

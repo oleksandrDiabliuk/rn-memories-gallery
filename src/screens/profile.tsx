@@ -5,11 +5,12 @@ import { AuthButton } from '../components/buttons';
 import { onAuthStateChanged } from 'firebase/auth';
 import { authentication } from '../services/config';
 import { logout } from '../services/auth';
+import { ROUTES } from '../constants';
 import { errorAlert } from '../services/alert';
-import { useAuth } from '../routes/AuthContext';
+import { useAuth, RouteParamsListProps } from '../routes';
 import { profile } from '../styles'
 
-export const Profile = ({navigation}) => {
+export const Profile = ({navigation}: RouteParamsListProps<ROUTES.PROFILE>) => {
   const [email, setEmail] = useState('');
   const { handleSetLoggedOut } = useAuth();
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import {
   Home,
   Profile,
@@ -8,13 +8,14 @@ import {
 } from '../screens';
 import { ROUTES, COLORS } from '../constants';
 import Icon from "react-native-vector-icons/FontAwesome5";
-
-const Tab = createBottomTabNavigator();
+import { AppRoutesParamsListProps } from './AppRoutes';
 
 type Props = {
   color: string;
   name: string;
 }
+
+const Tab = createBottomTabNavigator<AppRoutesParamsListProps>();
 
 export const Tabs = () => {
   const getTabBarIcon = ({color, name}: Props) => {

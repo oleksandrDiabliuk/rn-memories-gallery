@@ -5,9 +5,9 @@ import { LoginForm } from '../components/forms';
 import { ROUTES } from '../constants'
 import { signin } from '../services/auth';
 import { errorAlert } from '../services/alert';
-import { useAuth } from '../routes/AuthContext';
+import { useAuth, GuestScreenProps } from '../routes';
 
-export const Login = ({navigation}) => {
+export const Login = ({navigation}: GuestScreenProps<ROUTES.LOGIN>) => {
   const [loading, setLoading] = useState(false);
   const { handleSetLoggedIn } = useAuth();
 

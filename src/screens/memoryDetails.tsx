@@ -6,10 +6,11 @@ import { NavBar } from '../components/navBar/navbar';
 import { MainButton, Button } from '../components/buttons';
 import { VideoView } from '../components/video';
 import { ROUTES } from '../constants';
+import { RouteParamsListProps } from '../routes';
 import { deleteMemory } from '../services/firebaseDB';
 import { memoryDetails } from '../styles';
 
-export const MemoryDetails = ({navigation, route}) => {
+export const MemoryDetails = ({navigation, route}: RouteParamsListProps<ROUTES.MEMORY_DETAILS>) => {
   const [visible, setIsVisible] = useState<boolean>(false);
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const {memory} = route.params;
